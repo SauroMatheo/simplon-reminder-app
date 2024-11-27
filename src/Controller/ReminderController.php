@@ -30,6 +30,9 @@ final class ReminderController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $reminder->setCreatedAt(new \DateTime('now'));
+            $reminder->setDone(false);
+
             $entityManager->persist($reminder);
             $entityManager->flush();
 
