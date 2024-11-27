@@ -28,6 +28,8 @@ class ReminderType extends AbstractType
                 "label" => "Catégorie",
                 'class' => Category::class,
                 'choice_label' => 'name',
+                'placeholder' => 'Aucune catégorie',
+                'required' => false
             ])
         ;
     }
