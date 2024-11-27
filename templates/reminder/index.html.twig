@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reminder index{% endblock %}
+
+{% block body %}
+    <h1>Reminder index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>CreatedAt</th>
+                <th>DueDate</th>
+                <th>CompletedAt</th>
+                <th>IsDone</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for reminder in reminders %}
+            <tr>
+                <td>{{ reminder.id }}</td>
+                <td>{{ reminder.title }}</td>
+                <td>{{ reminder.description }}</td>
+                <td>{{ reminder.createdAt ? reminder.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ reminder.dueDate ? reminder.dueDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ reminder.completedAt ? reminder.completedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ reminder.isDone ? 'Yes' : 'No' }}</td>
+                <td>
+                    <a href="{{ path('app_reminder_show', {'id': reminder.id}) }}">show</a>
+                    <a href="{{ path('app_reminder_edit', {'id': reminder.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_reminder_new') }}">Create new</a>
+{% endblock %}

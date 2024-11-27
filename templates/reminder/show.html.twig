@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reminder{% endblock %}
+
+{% block body %}
+    <h1>Reminder</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ reminder.id }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ reminder.title }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ reminder.description }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ reminder.createdAt ? reminder.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>DueDate</th>
+                <td>{{ reminder.dueDate ? reminder.dueDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>CompletedAt</th>
+                <td>{{ reminder.completedAt ? reminder.completedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>IsDone</th>
+                <td>{{ reminder.isDone ? 'Yes' : 'No' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_reminder_index') }}">back to list</a>
+
+    <a href="{{ path('app_reminder_edit', {'id': reminder.id}) }}">edit</a>
+
+    {{ include('reminder/_delete_form.html.twig') }}
+{% endblock %}
