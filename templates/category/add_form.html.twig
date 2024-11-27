@@ -9,12 +9,6 @@
 </style>
 
 <div class="example-wrapper">
-    <ul>
-        {% for category in categories %}
-        <li>{{ category.getId() }} - {{ category.getName() }}</li>
-        {% endfor %}
-    </ul>
-
-    <a href="{{ path('add_category') }}">Créer une catégorie</a>
+    {{ form(form) }}
 </div>
 {% endblock %}
