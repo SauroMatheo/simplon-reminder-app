@@ -8,34 +8,35 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Title</th>
+                <th>Nom</th>
                 <th>Description</th>
-                <th>CreatedAt</th>
-                <th>DueDate</th>
-                <th>CompletedAt</th>
-                <th>IsDone</th>
-                <th>actions</th>
+                <th>Date limite</th>
+                <th>Terminé</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
         {% for reminder in reminders %}
             <tr>
-                <td>{{ reminder.id }}</td>
                 <td>{{ reminder.title }}</td>
-                <td>{{ reminder.description }}</td>
-                <td>{{ reminder.createdAt ? reminder.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+
+                {% if reminder.description|length > 50 %}
+                    <td title="{{ reminder.description }}">
+                    {{ reminder.description|slice(0,50) }}...
+                {% else %}
+                    <td>{{ reminder.description }}
+                {% endif %}
+                </td>
                 <td>{{ reminder.dueDate ? reminder.dueDate|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ reminder.completedAt ? reminder.completedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ reminder.isDone ? 'Yes' : 'No' }}</td>
+                <td>{{ reminder.isDone ? 'Oui' : 'Non' }}</td>
                 <td>
-                    <a href="{{ path('app_reminder_show', {'id': reminder.id}) }}">show</a>
-                    <a href="{{ path('app_reminder_edit', {'id': reminder.id}) }}">edit</a>
+                    <a href="{{ path('app_reminder_show', {'id': reminder.id}) }}">Détails</a>
+                    <a href="{{ path('app_reminder_edit', {'id': reminder.id}) }}">Modifier</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="8">no records found</td>
+                <td colspan="8">Aucun rapel trouvé !</td>
             </tr>
         {% endfor %}
         </tbody>

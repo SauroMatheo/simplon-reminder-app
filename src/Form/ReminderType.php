@@ -14,14 +14,20 @@ class ReminderType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('title')
-            ->add('description')
+            ->add('title', null, [
+                "label" => "Nom du rappel"
+            ])
+            ->add('description', null, [
+                "label" => "Description"
+            ])
             ->add('dueDate', null, [
-                'widget' => 'single_text',
+                "label" => "Date limite",
+                'widget' => 'single_text'
             ])
             ->add('category', EntityType::class, [
+                "label" => "Catégorie",
                 'class' => Category::class,
-                'choice_label' => 'id',
+                'choice_label' => 'name',
             ])
         ;
     }

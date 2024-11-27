@@ -1,18 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Reminder{% endblock %}
+{% block title %}Rappel{% endblock %}
 
 {% block body %}
-    <h1>Reminder</h1>
+    <h1>Rappel</h1>
 
     <table class="table">
         <tbody>
             <tr>
-                <th>Id</th>
+                <th>Identifiant</th>
                 <td>{{ reminder.id }}</td>
             </tr>
             <tr>
-                <th>Title</th>
+                <th>Nom</th>
                 <td>{{ reminder.title }}</td>
             </tr>
             <tr>
@@ -20,27 +20,27 @@
                 <td>{{ reminder.description }}</td>
             </tr>
             <tr>
-                <th>CreatedAt</th>
-                <td>{{ reminder.createdAt ? reminder.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <th>Créée le</th>
+                <td>{{ reminder.createdAt ? reminder.createdAt|date('d-m-Y H:i:s') : '' }}</td>
             </tr>
             <tr>
-                <th>DueDate</th>
-                <td>{{ reminder.dueDate ? reminder.dueDate|date('Y-m-d H:i:s') : '' }}</td>
+                <th>Date limite</th>
+                <td>{{ reminder.dueDate ? reminder.dueDate|date('d-m-Y H:i:s') : '' }}</td>
             </tr>
             <tr>
-                <th>CompletedAt</th>
-                <td>{{ reminder.completedAt ? reminder.completedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <th>Terminé le</th>
+                <td>{{ reminder.completedAt ? reminder.completedAt|date('d-m-Y H:i:s') : '' }}</td>
             </tr>
             <tr>
-                <th>IsDone</th>
-                <td>{{ reminder.isDone ? 'Yes' : 'No' }}</td>
+                <th>Terminé ?</th>
+                <td>{{ reminder.isDone ? 'Terminé' : 'À faire' }}</td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_reminder_index') }}">back to list</a>
+    <a href="{{ path('app_reminder_index') }}">Retour aux rappels</a>
 
-    <a href="{{ path('app_reminder_edit', {'id': reminder.id}) }}">edit</a>
+    <a href="{{ path('app_reminder_edit', {'id': reminder.id}) }}">Modifier</a>
 
     {{ include('reminder/_delete_form.html.twig') }}
 {% endblock %}
