@@ -37,6 +37,10 @@
                 <th>Terminé ?</th>
                 <td>{{ reminder.isDone ? 'Terminé' : 'À faire' }}</td>
             </tr>
+            <tr>
+                <th>Catégorie</th>
+                <td>{{ reminder.category ? reminder.category.name : 'Aucune catégorie' }}</td>
+            </tr>
         </tbody>
     </table>
 
