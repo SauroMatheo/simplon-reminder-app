@@ -51,8 +51,7 @@
                     </div>
                     <div class="mt-4">
                         <h3 class="text-xl font-semibold text-gray-900 hover:text-blue-600 transition-colors">
-                            {# TODO: Link it to the details page #}
-                            <a href="#">{{ reminder.getTitle() }}</a>
+                            <a href="{{ path('app_reminder_show', {id: reminder.id}) }}">{{ reminder.getTitle() }}</a>
                         </h3>
                         {# TODO: Make the tooltip and crop the description to 50ish characters #}
                         <p class="mt-3 text-gray-600 line-clamp-3">{{ reminder.getDescription() }}</p>
@@ -65,8 +64,7 @@
                             </svg>
                             {{ reminder.getCategory().getName()|default("Aucune catégorie") }}
                         </div>
-                        {# TODO: Link it to the details page #}
-                        <a href="#" class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">
+                        <a href="{{ path('app_reminder_show', {id: reminder.id}) }}" class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">
                             Voir plus
                             <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
