@@ -1,60 +1,102 @@
 <?php
 
-namespace App\Controller;
+namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-
-use App\Repository\CategoryRepository;
-
-use App\Form\CategoryType;
-
+use PHPUnit\Framework\TestCase;
+use App\Controller\CategoryController;
 use App\Entity\Category;
+use App\Repository\CategoryRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
-#[Route('/categories')]
-class CategoryController extends AbstractController
+class CategoryControllerTest extends TestCase
 {
-    #[Route('', name: 'categories')]
-    public function index(
-        CategoryRepository $categoryRepo
-        ): Response
+    public function testIndex(): void
     {
-        // TODO: Limiting to 4, just to show off that the limit works. Change me !
-        $categories = $categoryRepo->findBy([], limit: 4);
 
-        return $this->render('category/index.html.twig', [
-            'categories' => $categories
+        $categoryRepository = $this->createMock(CategoryRepository::class);
+        $categoryRepository->method('findAll')->willReturn([
+            new Category(),
+            new Category(),
         ]);
+
+        $twig = $this->createMock(Environment::class);
+        $twig->expects($this->once())
+            ->method('render')
+            ->with('category/index.html.twig', [
+                'categories' => [new Category(), new Category()],
+            ])
+            ->willReturn('<html>Categories</html>');
+
+        $controller = new CategoryController();
+        $controller->setContainer($this->getContainerMock($twig));
+
+        $response = $controller->index($categoryRepository);
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertStringContainsString('Categories', $response->getContent());
     }
 
-    #[Route('/add', name: 'add_category')]
-    public function add(
-        CategoryRepository $categoryRepo,
-        Request $request,
-        EntityManagerInterface $entityManager
-        ): Response
-    {
+    public function testNew(): void    {
+
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->once())->method('persist');
+        $entityManager->expects($this->once())->method('flush');
+
+
+        $form = $this->createMock(\Symfony\Component\Form\FormInterface::class);        $form->method('isSubmitted')->willReturn(true);
+        $form->method('isValid')->willReturn(true);
+
+        $request = $this->createMock(Request::class);
+
+        $twig = $this->createMock(Environment::class);
+        $twig->expects($this->once())
+            ->method('render')
+            ->with('category/new.html.twig', $this->anything())
+            ->willReturn('<html>New Category</html>');
+
+        $controller = new CategoryController();
+        $controller->setContainer($this->getContainerMock($twig));
+
+        $response = $controller->new($request, $entityManager);
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertStringContainsString('New Category', $response->getContent());
+    }
+
+    public function testDelete(): void    {
+
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->once())->method('remove');
+        $entityManager->expects($this->once())->method('flush');
+
+        $request = $this->createMock(Request::class);
+        $request->method('get')->willReturn('valid_token');
+
+        $controller = $this->getMockBuilder(CategoryController::class)
+            ->onlyMethods(['isCsrfTokenValid'])
+            ->getMock();
+        $controller->method('isCsrfTokenValid')->willReturn(true);
+
         $category = new Category();
+        $response = $controller->delete($request, $category, $entityManager);
 
-        $form = $this->createForm(CategoryType::class, $category);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals(303, $response->getStatusCode());
+    }
 
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $category = $form->getData();
-            
-
-            $entityManager->persist($categoryRepo);
-            $entityManager->flush();
-
-            /* TODO: Should instead redirect to a detailed view of the category...
-            But a details page with only the name displayed is a bit redundant
-            */ 
-            return $this->redirectToRoute('categories');
-        }
-
-        return $this->render('category/add_form.html.twig', [
-            'form' => $form
+    private function getContainerMock($twig = null)
+    {
+        $container = $this->createMock(\Symfony\Component\DependencyInjection\ContainerInterface::class);
+        $container->method('get')->willReturnMap([
+            ['twig', $twig],
         ]);
+
+        return $container;
     }
 }
+
