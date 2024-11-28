@@ -53,8 +53,14 @@
                         <h3 class="text-xl font-semibold text-gray-900 hover:text-blue-600 transition-colors">
                             <a href="{{ path('app_reminder_show', {id: reminder.id}) }}">{{ reminder.getTitle() }}</a>
                         </h3>
-                        {# TODO: Make the tooltip and crop the description to 50ish characters #}
-                        <p class="mt-3 text-gray-600 line-clamp-3">{{ reminder.getDescription() }}</p>
+                        {% if reminder.getDescription()|length > 96 %}
+                        <p title="{{ reminder.getDescription() }}" class="mt-3 text-gray-600 line-clamp-3">
+                            {{ reminder.getDescription()|slice(0,90) }} [...]
+                        {% else %}
+                        <p class="mt-3 text-gray-600 line-clamp-3">
+                            {{ reminder.getDescription() }}
+                        {% endif %}
+                        </p>
                     </div>
                     <div class="mt-6 flex justify-between items-end gap-x-4">
                         {# TODO: Link it to the details page for thne Category #}
