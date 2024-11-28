@@ -2,24 +2,35 @@
 
 namespace App\Controller;
 
+use App\Service\PaginationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-
 use App\Repository\ReminderRepository;
 
 class HomepageController extends AbstractController
 {
-    #[Route('', name: 'home')]
-    public function index(
-        ReminderRepository $reminderRepo
-        ): Response
+    public function __construct(
+        private PaginationService $paginationService
+    ) {}
+
+    #[Route('/', name: 'homepage')]
+    public function index(ReminderRepository $repository, Request $request): Response
     {
-        // TODO: La limite est à 4 pour montrer qu'elle fonctionne, modifier plus tard
-        $limitReminders = $reminderRepo->findBy([], limit: 4);
+        $queryBuilder = $repository->createQueryBuilder('r')
+            ->where('r.isDone = :isDone')
+            ->setParameter('isDone', false)
+            ->orderBy('r.dueDate', 'ASC');
+
+        $pagination = $this->paginationService->paginate($queryBuilder, $request);
 
         return $this->render('homepage/index.html.twig', [
-            'reminders' => $limitReminders
+            'reminders' => $pagination['items'],
+            'pagination' => $pagination,
         ]);
     }
 }
+
+
+
