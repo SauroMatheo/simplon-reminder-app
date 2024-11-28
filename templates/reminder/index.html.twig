@@ -11,7 +11,7 @@
         </div>
         <div class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:mt-16 lg:mx-0 lg:max-w-none lg:grid-cols-4">
             {% for reminder in reminders %}
-            <article class="flex flex-col bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden relative group">
+            <article class="flex flex-col bg-white rounded-xl {{ reminder.isDone ? 'shadow-green-200' : 'shadow-red-200' }} shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden relative group">
                 <div class="p-6">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-x-4 text-xs">
