@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Reminder{% endblock %}
+
+{% block body %}
+    <h1>Créer un noveau rappel</h1>
+
+    {{ include('reminder/_form.html.twig') }}
+
+    <a href="{{ path('app_reminder_index') }}">Retour aux rappels</a>
+{% endblock %}
