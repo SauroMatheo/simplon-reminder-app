@@ -27,10 +27,12 @@
                 <th>Date limite</th>
                 <td>{{ reminder.dueDate ? reminder.dueDate|date('d-m-Y H:i:s') : '' }}</td>
             </tr>
+            {% if reminder.completedAt %}
             <tr>
                 <th>Terminé le</th>
-                <td>{{ reminder.completedAt ? reminder.completedAt|date('d-m-Y H:i:s') : '' }}</td>
+                <td>{{ reminder.completedAt|date('d-m-Y H:i:s') }}</td>
             </tr>
+            {% endif %}
             <tr>
                 <th>Terminé ?</th>
                 <td>{{ reminder.isDone ? 'Terminé' : 'À faire' }}</td>
