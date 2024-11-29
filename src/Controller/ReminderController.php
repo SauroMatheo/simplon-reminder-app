@@ -92,4 +92,21 @@ final class ReminderController extends AbstractController
 
         return $this->redirectToRoute('app_reminder_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/{id}/done', name: 'app_reminder_toggle', methods: ['POST'])]
+    public function toggle(Request $request, Reminder $reminder, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$reminder->getId(), $request->getPayload()->getString('_token'))) {
+            if ($reminder->isDone()) {
+                $reminder->setDone(false);
+                $reminder->setCompletedAt(null);
+            } else {
+                $reminder->setDone(true);
+                $reminder->setCompletedAt(new \DateTime('now'));
+            }
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_reminder_index', [], Response::HTTP_SEE_OTHER);
+    }
 }
