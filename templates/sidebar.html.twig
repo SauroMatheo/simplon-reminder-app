@@ -1,9 +1,9 @@
 <div class="bg-gradient-to-b from-blue-600 to-blue-500 text-white 2xl:w-80 2xl:max-w-80 m-0">
     <span class="flex flex-wrap items-center justify-evenly flex-row 2xl:flex-col flex-grow font-bold p-4 gap-8 text-center">
-        <a class="text-4xl">Accueil</a>
-        <a class="text-3xl">Rappels</a>
-        <a class="text-3xl">Créer un rappel</a>
-        <a class="text-3xl">Catégories</a>
-        <a class="text-3xl">Créer une catégorie</a>
+        <a href="{{ path('homepage') }}" class="text-4xl">Accueil</a>
+        <a href="{{ path('app_reminder_index') }}" class="text-3xl">Rappels</a>
+        <a href="{{ path('app_reminder_new') }}" class="text-3xl">Créer un rappel</a>
+        <a href="{{ path('app_category_index') }}" class="text-3xl">Catégories</a>
+        <a href="{{ path('app_category_new') }}" class="text-3xl">Créer une catégorie</a>
     </span>
 </div>
