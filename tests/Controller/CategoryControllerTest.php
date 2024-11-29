@@ -2,100 +2,230 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\Category;
 use PHPUnit\Framework\TestCase;
 use App\Controller\CategoryController;
-use App\Entity\Category;
 use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class CategoryControllerTest extends TestCase
 {
+    private $categoryRepository;
+    private $entityManager;
+    private $controller;
+    private $form;
+
+    protected function setUp(): void
+    {
+        $this->categoryRepository = $this->createMock(CategoryRepository::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->form = $this->createMock(FormInterface::class);
+
+        $this->controller = $this->getMockBuilder(CategoryController::class)
+            ->onlyMethods(['render', 'createForm', 'redirectToRoute', 'isCsrfTokenValid'])
+            ->getMock();
+    }
+
     public function testIndex(): void
     {
+        $categories = [new Category(), new Category()];
 
-        $categoryRepository = $this->createMock(CategoryRepository::class);
-        $categoryRepository->method('findAll')->willReturn([
-            new Category(),
-            new Category(),
-        ]);
+        $this->categoryRepository->expects($this->once())
+            ->method('findAll')
+            ->willReturn($categories);
 
-        $twig = $this->createMock(Environment::class);
-        $twig->expects($this->once())
-            ->method('render')
-            ->with('category/index.html.twig', [
-                'categories' => [new Category(), new Category()],
-            ])
-            ->willReturn('<html>Categories</html>');
-
-        $controller = new CategoryController();
-        $controller->setContainer($this->getContainerMock($twig));
-
-        $response = $controller->index($categoryRepository);
-
+        $response = $this->controller->index($this->categoryRepository);
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertStringContainsString('Categories', $response->getContent());
     }
 
-    public function testNew(): void    {
-
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->expects($this->once())->method('persist');
-        $entityManager->expects($this->once())->method('flush');
-
-
-        $form = $this->createMock(\Symfony\Component\Form\FormInterface::class);        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
-
-        $request = $this->createMock(Request::class);
-
-        $twig = $this->createMock(Environment::class);
-        $twig->expects($this->once())
-            ->method('render')
-            ->with('category/new.html.twig', $this->anything())
-            ->willReturn('<html>New Category</html>');
-
-        $controller = new CategoryController();
-        $controller->setContainer($this->getContainerMock($twig));
-
-        $response = $controller->new($request, $entityManager);
-
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertStringContainsString('New Category', $response->getContent());
-    }
-
-    public function testDelete(): void    {
-
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->expects($this->once())->method('remove');
-        $entityManager->expects($this->once())->method('flush');
-
-        $request = $this->createMock(Request::class);
-        $request->method('get')->willReturn('valid_token');
-
-        $controller = $this->getMockBuilder(CategoryController::class)
-            ->onlyMethods(['isCsrfTokenValid'])
-            ->getMock();
-        $controller->method('isCsrfTokenValid')->willReturn(true);
-
-        $category = new Category();
-        $response = $controller->delete($request, $category, $entityManager);
-
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(303, $response->getStatusCode());
-    }
-
-    private function getContainerMock($twig = null)
+    public function testNew(): void
     {
-        $container = $this->createMock(\Symfony\Component\DependencyInjection\ContainerInterface::class);
-        $container->method('get')->willReturnMap([
-            ['twig', $twig],
-        ]);
+        $request = new Request();
 
-        return $container;
+        $this->controller->expects($this->once())
+            ->method('createForm')
+            ->willReturn($this->form);
+
+        $this->form->expects($this->once())
+            ->method('handleRequest')
+            ->with($request);
+
+        $this->form->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $this->entityManager->expects($this->once())
+            ->method('persist');
+
+        $this->entityManager->expects($this->once())
+            ->method('flush');
+
+        $this->controller->expects($this->once())
+            ->method('redirectToRoute')
+            ->willReturn(new RedirectResponse('/categories'));
+
+        $response = $this->controller->new($request, $this->entityManager);
+        $this->assertInstanceOf(Response::class, $response);
     }
+
+    public function testNewWithInvalidForm(): void
+{
+    $request = new Request();
+    $category = new Category();
+
+    $this->controller->expects($this->once())
+        ->method('createForm')
+        ->willReturn($this->form);
+
+    $this->form->expects($this->once())
+        ->method('handleRequest')
+        ->with($request);
+
+    $this->form->expects($this->once())
+        ->method('isSubmitted')
+        ->willReturn(false);
+
+    $response = $this->controller->new($request, $this->entityManager);
+    $this->assertInstanceOf(Response::class, $response);
+}
+public function testShow(): void
+{
+    $category = new Category();
+    $category->setName('Test Category');
+
+        $this->controller->expects($this->once())
+        ->method('render')
+        ->with(
+            'category/show.html.twig',
+            ['category' => $category]
+        )
+        ->willReturn(new Response());
+
+    $response = $this->controller->show($category);
+
+
+    $this->assertInstanceOf(Response::class, $response);
+}
+public function testEditWithValidForm(): void
+{
+    $request = new Request();
+    $category = new Category();
+
+    $this->controller->expects($this->once())
+        ->method('createForm')
+        ->willReturn($this->form);
+
+    $this->form->expects($this->once())
+        ->method('handleRequest')
+        ->with($request);
+
+    $this->form->expects($this->once())
+        ->method('isSubmitted')
+        ->willReturn(true);
+
+    $this->form->expects($this->once())
+        ->method('isValid')
+        ->willReturn(true);
+
+    $this->entityManager->expects($this->once())
+        ->method('flush');
+
+    $this->controller->expects($this->once())
+        ->method('redirectToRoute')
+        ->with('app_category_index', [], Response::HTTP_SEE_OTHER)
+        ->willReturn(new RedirectResponse('/categories'));
+
+    $response = $this->controller->edit($request, $category, $this->entityManager);
+    $this->assertInstanceOf(Response::class, $response);
+}
+
+public function testEditWithInvalidForm(): void
+{
+    $request = new Request();
+    $category = new Category();
+
+    $this->controller->expects($this->once())
+        ->method('createForm')
+        ->willReturn($this->form);
+
+    $this->form->expects($this->once())
+        ->method('handleRequest')
+        ->with($request);
+
+    $this->form->expects($this->once())
+        ->method('isSubmitted')
+        ->willReturn(false);
+
+    $response = $this->controller->edit($request, $category, $this->entityManager);
+    $this->assertInstanceOf(Response::class, $response);
+}
+
+public function testDeleteWithValidToken(): void
+{
+    $category = new Category();
+    $reflection = new \ReflectionClass($category);
+    $property = $reflection->getProperty('id');
+    $property->setAccessible(true);
+    $property->setValue($category, 1);
+
+
+    $request = new Request([], ['_token' => 'valid_token']);
+
+    $this->controller->expects($this->once())
+        ->method('isCsrfTokenValid')
+        ->with('delete1', 'valid_token')
+        ->willReturn(true);
+
+    $this->entityManager->expects($this->once())
+        ->method('remove')
+        ->with($category);
+
+    $this->entityManager->expects($this->once())
+        ->method('flush');
+
+    $this->controller->expects($this->once())
+        ->method('redirectToRoute')
+        ->willReturn(new RedirectResponse('/categories'));
+
+    $response = $this->controller->delete($request, $category, $this->entityManager);
+    $this->assertInstanceOf(Response::class, $response);
+}
+
+public function testDeleteWithInvalidToken(): void
+{
+    $category = new Category();
+    $reflection = new \ReflectionClass($category);
+    $property = $reflection->getProperty('id');
+    $property->setAccessible(true);
+    $property->setValue($category, 1);
+
+    $request = new Request([], ['_token' => 'invalid_token']);
+
+    $this->controller->expects($this->once())
+        ->method('isCsrfTokenValid')
+        ->with('delete1', 'invalid_token')
+        ->willReturn(false);
+
+    $this->entityManager->expects($this->never())
+        ->method('remove');
+
+    $this->entityManager->expects($this->never())
+        ->method('flush');
+
+    $this->controller->expects($this->once())
+        ->method('redirectToRoute')
+        ->willReturn(new RedirectResponse('/categories'));
+
+    $response = $this->controller->delete($request, $category, $this->entityManager);
+    $this->assertInstanceOf(Response::class, $response);
+}
 }

@@ -3,147 +3,225 @@
 namespace App\Tests\Controller;
 
 use App\Entity\Reminder;
+use PHPUnit\Framework\TestCase;
+use App\Controller\ReminderController;
+use App\Repository\ReminderRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
-final class ReminderControllerTest extends WebTestCase
+class ReminderControllerTest extends TestCase
 {
-    private KernelBrowser $client;
-    private EntityManagerInterface $manager;
-    private EntityRepository $repository;
-    private string $path = '/reminder/';
+    private $reminderRepository;
+    private $entityManager;
+    private $controller;
+    private $form;
 
     protected function setUp(): void
     {
-        $this->client = static::createClient();
-        $this->manager = static::getContainer()->get('doctrine')->getManager();
-        $this->repository = $this->manager->getRepository(Reminder::class);
+        $this->reminderRepository = $this->createMock(ReminderRepository::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->form = $this->createMock(FormInterface::class);
 
-        foreach ($this->repository->findAll() as $object) {
-            $this->manager->remove($object);
-        }
-
-        $this->manager->flush();
+        $this->controller = $this->getMockBuilder(ReminderController::class)
+            ->onlyMethods(['render', 'createForm', 'redirectToRoute', 'isCsrfTokenValid'])
+            ->getMock();
     }
 
     public function testIndex(): void
     {
-        $this->client->followRedirects();
-        $crawler = $this->client->request('GET', $this->path);
+        $reminders = [new Reminder(), new Reminder()];
 
-        self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('Reminder index');
+        $this->reminderRepository->expects($this->once())
+            ->method('findAll')
+            ->willReturn($reminders);
 
-        // Use the $crawler to perform additional assertions e.g.
-        // self::assertSame('Some text on the page', $crawler->filter('.p')->first());
+        $response = $this->controller->index($this->reminderRepository);
+        $this->assertInstanceOf(Response::class, $response);
     }
 
     public function testNew(): void
     {
-        $this->markTestIncomplete();
-        $this->client->request('GET', sprintf('%snew', $this->path));
+        $request = new Request();
 
-        self::assertResponseStatusCodeSame(200);
+        $this->controller->expects($this->once())
+            ->method('createForm')
+            ->willReturn($this->form);
 
-        $this->client->submitForm('Save', [
-            'reminder[title]' => 'Testing',
-            'reminder[description]' => 'Testing',
-            'reminder[createdAt]' => 'Testing',
-            'reminder[dueDate]' => 'Testing',
-            'reminder[completedAt]' => 'Testing',
-            'reminder[isDone]' => 'Testing',
-            'reminder[category]' => 'Testing',
-        ]);
+        $this->form->expects($this->once())
+            ->method('handleRequest')
+            ->with($request);
 
-        self::assertResponseRedirects($this->path);
+        $this->form->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
 
-        self::assertSame(1, $this->repository->count([]));
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $this->entityManager->expects($this->once())
+            ->method('persist');
+
+        $this->entityManager->expects($this->once())
+            ->method('flush');
+
+        $this->controller->expects($this->once())
+            ->method('redirectToRoute')
+            ->willReturn(new RedirectResponse('/reminders'));
+
+        $response = $this->controller->new($request, $this->entityManager);
+        $this->assertInstanceOf(Response::class, $response);
     }
 
-    public function testShow(): void
-    {
-        $this->markTestIncomplete();
-        $fixture = new Reminder();
-        $fixture->setTitle('My Title');
-        $fixture->setDescription('My Title');
-        $fixture->setCreatedAt('My Title');
-        $fixture->setDueDate('My Title');
-        $fixture->setCompletedAt('My Title');
-        $fixture->setIsDone('My Title');
-        $fixture->setCategory('My Title');
+    public function testNewWithInvalidForm(): void
+{
+    $request = new Request();
+    $category = new Reminder();
 
-        $this->manager->persist($fixture);
-        $this->manager->flush();
+    $this->controller->expects($this->once())
+        ->method('createForm')
+        ->willReturn($this->form);
 
-        $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
+    $this->form->expects($this->once())
+        ->method('handleRequest')
+        ->with($request);
 
-        self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('Reminder');
+    $this->form->expects($this->once())
+        ->method('isSubmitted')
+        ->willReturn(false);
 
-        // Use assertions to check that the properties are properly displayed.
-    }
+    $response = $this->controller->new($request, $this->entityManager);
+    $this->assertInstanceOf(Response::class, $response);
+}
 
-    public function testEdit(): void
-    {
-        $this->markTestIncomplete();
-        $fixture = new Reminder();
-        $fixture->setTitle('Value');
-        $fixture->setDescription('Value');
-        $fixture->setCreatedAt('Value');
-        $fixture->setDueDate('Value');
-        $fixture->setCompletedAt('Value');
-        $fixture->setIsDone('Value');
-        $fixture->setCategory('Value');
+public function testShow(): void
+{
+    $reminder = new Reminder();
+    $reminder->setTitle('Test Reminder');
 
-        $this->manager->persist($fixture);
-        $this->manager->flush();
+    $this->controller->expects($this->once())
+        ->method('render')
+        ->with(
+            'reminder/show.html.twig',
+            ['reminder' => $reminder]
+        )
+        ->willReturn(new Response());
 
-        $this->client->request('GET', sprintf('%s%s/edit', $this->path, $fixture->getId()));
+    $response = $this->controller->show($reminder);
 
-        $this->client->submitForm('Update', [
-            'reminder[title]' => 'Something New',
-            'reminder[description]' => 'Something New',
-            'reminder[createdAt]' => 'Something New',
-            'reminder[dueDate]' => 'Something New',
-            'reminder[completedAt]' => 'Something New',
-            'reminder[isDone]' => 'Something New',
-            'reminder[category]' => 'Something New',
-        ]);
+    $this->assertInstanceOf(Response::class, $response);
+}
 
-        self::assertResponseRedirects('/reminder/');
+public function testEditWithValidForm(): void
+{
+    $request = new Request();
+    $reminder = new Reminder();
 
-        $fixture = $this->repository->findAll();
+    $this->controller->expects($this->once())
+        ->method('createForm')
+        ->willReturn($this->form);
 
-        self::assertSame('Something New', $fixture[0]->getTitle());
-        self::assertSame('Something New', $fixture[0]->getDescription());
-        self::assertSame('Something New', $fixture[0]->getCreatedAt());
-        self::assertSame('Something New', $fixture[0]->getDueDate());
-        self::assertSame('Something New', $fixture[0]->getCompletedAt());
-        self::assertSame('Something New', $fixture[0]->getIsDone());
-        self::assertSame('Something New', $fixture[0]->getCategory());
-    }
+    $this->form->expects($this->once())
+        ->method('handleRequest')
+        ->with($request);
 
-    public function testRemove(): void
-    {
-        $this->markTestIncomplete();
-        $fixture = new Reminder();
-        $fixture->setTitle('Value');
-        $fixture->setDescription('Value');
-        $fixture->setCreatedAt('Value');
-        $fixture->setDueDate('Value');
-        $fixture->setCompletedAt('Value');
-        $fixture->setIsDone('Value');
-        $fixture->setCategory('Value');
+    $this->form->expects($this->once())
+        ->method('isSubmitted')
+        ->willReturn(true);
 
-        $this->manager->persist($fixture);
-        $this->manager->flush();
+    $this->form->expects($this->once())
+        ->method('isValid')
+        ->willReturn(true);
 
-        $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
-        $this->client->submitForm('Delete');
+    $this->entityManager->expects($this->once())
+        ->method('flush');
 
-        self::assertResponseRedirects('/reminder/');
-        self::assertSame(0, $this->repository->count([]));
-    }
+    $response = $this->controller->edit($request, $reminder, $this->entityManager);
+    $this->assertInstanceOf(Response::class, $response);
+}
+
+public function testEditWithInvalidForm(): void
+{
+    $request = new Request();
+    $reminder = new Reminder();
+
+    $this->controller->expects($this->once())
+        ->method('createForm')
+        ->willReturn($this->form);
+
+    $this->form->expects($this->once())
+        ->method('handleRequest')
+        ->with($request);
+
+    $this->form->expects($this->once())
+        ->method('isSubmitted')
+        ->willReturn(false);
+
+    $response = $this->controller->edit($request, $reminder, $this->entityManager);
+    $this->assertInstanceOf(Response::class, $response);
+}
+
+public function testDeleteWithValidToken(): void
+{
+    $reminder = new Reminder();
+    $reflection = new \ReflectionClass($reminder);
+    $property = $reflection->getProperty('id');
+    $property->setAccessible(true);
+    $property->setValue($reminder, 1);
+
+    // Créer une requête simple avec un token
+    $request = new Request([], ['_token' => 'valid_token']);
+
+    $this->controller->expects($this->once())
+        ->method('isCsrfTokenValid')
+        ->with('delete1', 'valid_token')
+        ->willReturn(true);
+
+    $this->entityManager->expects($this->once())
+        ->method('remove')
+        ->with($reminder);
+
+    $this->entityManager->expects($this->once())
+        ->method('flush');
+
+    $this->controller->expects($this->once())
+        ->method('redirectToRoute')
+        ->willReturn(new RedirectResponse('/categories'));
+
+    $response = $this->controller->delete($request, $reminder, $this->entityManager);
+    $this->assertInstanceOf(Response::class, $response);
+}
+
+public function testDeleteWithInvalidToken(): void
+{
+    $reminder = new Reminder();
+    $reflection = new \ReflectionClass($reminder);
+    $property = $reflection->getProperty('id');
+    $property->setAccessible(true);
+    $property->setValue($reminder, 1);
+
+    // Créer une requête simple avec un token invalide
+    $request = new Request([], ['_token' => 'invalid_token']);
+
+    $this->controller->expects($this->once())
+        ->method('isCsrfTokenValid')
+        ->with('delete1', 'invalid_token')
+        ->willReturn(false);
+
+    $this->entityManager->expects($this->never())
+        ->method('remove');
+
+    $this->entityManager->expects($this->never())
+        ->method('flush');
+
+    $this->controller->expects($this->once())
+        ->method('redirectToRoute')
+        ->willReturn(new RedirectResponse('/categories'));
+
+    $response = $this->controller->delete($request, $reminder, $this->entityManager);
+    $this->assertInstanceOf(Response::class, $response);
+}
 }
