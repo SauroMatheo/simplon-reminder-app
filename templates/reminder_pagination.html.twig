@@ -1,0 +1,32 @@
+{% if pagination.totalPages > 1 %}
+<div class="col-span-full mt-10 flex justify-center">
+    <nav class="flex items-center gap-x-2" aria-label="Pagination">
+        {% if pagination.hasPreviousPage %}
+            <a href="{{ path('homepage', {page: pagination.currentPage - 1}) }}"
+                class="inline-flex items-center rounded-lg bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-100 transition-colors">
+                <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Précédent
+            </a>
+        {% endif %}
+
+        {% for i in max(1, pagination.currentPage -5) .. min(pagination.totalPages, pagination.currentPage +5) %}
+            <a href="{{ path(link, {page: i}) }}"
+                class="inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold {{ pagination.currentPage == i ? 'bg-blue-600 text-white' : 'text-gray-900 hover:bg-gray-100' }} transition-colors">
+                {{ i }}
+            </a>
+        {% endfor %}
+
+        {% if pagination.hasNextPage %}
+            <a href="{{ path(link, {page: pagination.currentPage + 1}) }}"
+                class="inline-flex items-center rounded-lg bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-100 transition-colors">
+                Suivant
+                <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+        {% endif %}
+    </nav>
+</div>
+{% endif %}
