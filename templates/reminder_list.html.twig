@@ -65,12 +65,13 @@
             </p>
         </div>
         <div class="mt-6 flex justify-between items-end gap-x-4">
-            {# TODO: Link it to the details page for thne Category #}
             <div class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-700">
-                <svg class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" />
-                </svg>
-                {{ reminder.getCategory().getName()|default("Aucune catégorie") }}
+                <a href="{{ path('app_category_show', {id: reminder.category.id}) }}" class="inline-flex items-center">
+                    <svg class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                    {{ reminder.getCategory().getName()|default("Aucune catégorie") }}
+                </a>
             </div>
             <a href="{{ path('app_reminder_show', {id: reminder.id}) }}" class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">
                 Voir plus
