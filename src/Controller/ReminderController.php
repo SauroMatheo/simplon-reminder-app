@@ -25,7 +25,7 @@ final class ReminderController extends AbstractController
         $queryBuilder = $repository->createQueryBuilder('r')
             ->orderBy('r.dueDate', 'ASC');
             
-        $pagination = $this->paginationService->paginate($queryBuilder, $request, 12);
+        $pagination = $this->paginationService->paginate($queryBuilder, $request, 9);
 
         return $this->render('reminder/index.html.twig', [
             'reminders' => $pagination['items'],
