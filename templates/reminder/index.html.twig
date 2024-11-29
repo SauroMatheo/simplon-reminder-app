@@ -3,86 +3,21 @@
 {% block title %}Rappels{% endblock %}
 
 {% block body %}
-<div class="bg-gradient-to-b from-gray-50 to-white py-24 sm:py-32">
-    <div class="mx-auto max-w-full px-6 lg:px-8">
-        <div class="mx-auto max-w-2xl lg:mx-0">
-            <h2 class="text-pretty text-4xl font-bold text-gray-900 sm:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">Mes rappels</h2>
-            <p class="mt-4 text-lg text-gray-600 border-l-4 border-blue-500 pl-4">Voici la liste des tâches que vous devez encore réaliser !</p>
-        </div>
-        <div class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:mt-16 lg:mx-0 lg:max-w-none lg:grid-cols-4">
-            {% for reminder in reminders %}
-            <article class="flex flex-col bg-white rounded-xl {{ reminder.isDone ? 'shadow-green-200' : 'shadow-red-200' }} shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden relative group">
-                <div class="p-6">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-x-4 text-xs">
-                            <time class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
-                                <svg class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                {{ reminder.getDueDate()|date('d/m/Y H:i:s') }}
-                            </time>
-                        </div>
-                        <div class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            {# TODO: Show whether or not it's done. #}
-                            {# TODO: Link it so that it updates the status. #}
-                            {# Mark as done icon #}
-                            <button class="text-gray-500 hover:text-blue-600 focus:outline-none" title="Marquer comme terminé">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </button>
-                            {# Edit icon #}
-                            <a href="{{ path('app_reminder_edit', {id: reminder.id}) }}" class="text-gray-500 hover:text-green-600 focus:outline-none" title="Modifier">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                            </a>
-                            {# Delete icon #}
-                            {# Form is taken directly out of _delete_form.html.twig #}
-                            <form method="post" action="{{ path('app_reminder_delete', {'id': reminder.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce rappel ?');">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reminder.id) }}">
-                                <button class="text-gray-500 hover:text-red-600 focus:outline-none" title="Supprimer">
-                                    <svg transform="translate(0,2.75)" class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path x="500" d="M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6M18 6V16.2C18 17.8802 18 18.7202 17.673 19.362C17.3854 19.9265 16.9265 20.3854 16.362 20.673C15.7202 21 14.8802 21 13.2 21H10.8C9.11984 21 8.27976 21 7.63803 20.673C7.07354 20.3854 6.6146 19.9265 6.32698 19.362C6 18.7202 6 17.8802 6 16.2V6M14 10V17M10 10V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <h3 class="text-xl font-semibold text-gray-900 hover:text-blue-600 transition-colors">
-                            <a href="{{ path('app_reminder_show', {id: reminder.id}) }}">{{ reminder.getTitle() }}</a>
-                        </h3>
-                        {% if reminder.getDescription()|length > 96 %}
-                        <p title="{{ reminder.getDescription() }}" class="mt-3 text-gray-600 line-clamp-3">
-                            {{ reminder.getDescription()|slice(0,90) }} [...]
-                        {% else %}
-                        <p class="mt-3 text-gray-600 line-clamp-3">
-                            {{ reminder.getDescription() }}
-                        {% endif %}
-                        </p>
-                    </div>
-                    <div class="mt-6 flex justify-between items-end gap-x-4">
-                        {# TODO: Link it to the details page for thne Category #}
-                        <div class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-700">
-                            <svg class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" />
-                            </svg>
-                            {{ reminder.getCategory().getName()|default("Aucune catégorie") }}
-                        </div>
-                        <a href="{{ path('app_reminder_show', {id: reminder.id}) }}" class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">
-                            Voir plus
-                            <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </article>
-            {% endfor %}
-        </div>
+<div class="mx-auto max-w-7xl px-6 lg:px-0">
+    <div class="mx-auto max-w-2xl lg:mx-0">
+        <h2 class="text-pretty text-4xl font-bold text-gray-900 sm:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">Mes rappels</h2>
     </div>
+    <div class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:mt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+        {% for reminder in reminders %}
+        {{ include('reminder_list.html.twig') }}
+        {% endfor %}
+    </div>
+
+    <br><br>
+    <a class="text-lg m-4 rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700 transition-colors" href="{{ path('app_reminder_new') }}">
+        Créer un Rappel ►
+    </a>
+    {{ include('reminder_pagination.html.twig', {'link': 'app_reminder_index'}) }}
 </div>
 
-    <a href="{{ path('app_reminder_new') }}">Create new</a>
 {% endblock %}
