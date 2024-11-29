@@ -1,6 +1,6 @@
 {{ form_start(form) }}
     {# {{ form_widget(form) }} #}
-    <div class="flex flex-col">
+    <div class="flex flex-col gap-2 max-w-full">
         <div class="flex flex-col">
             <label for="{{ field_name(form.title) }}">{{ field_label(form.title) }}</label>
             <input
@@ -10,7 +10,7 @@
                 name="{{ field_name(form.title) }}"
                 value="{{ field_value(form.title) }}"
                 placeholder="{{ field_label(form.title) }}..."
-                class="drop-shadow-md"
+                class="border shadow-sm  border-slate-200 p-1 rounded-md"
             ></input>
         </div>
 
@@ -22,38 +22,40 @@
                 name="{{ field_name(form.description) }}"
                 value="{{ field_value(form.description) }}"
                 placeholder="{{ field_label(form.description) }}..."
-                class="drop-shadow-md"
+                class="border shadow-sm  border-slate-200 p-1 rounded-md"
             ></textarea>
         </div>
 
-        <div class="flex flex-col">
-            <label for="{{ field_name(form.dueDate) }}">{{ field_label(form.dueDate) }}</label>
-            <input
-                required
-                type="datetime-local"
-                id="{{ field_name(form.dueDate) }}"
-                name="{{ field_name(form.dueDate) }}"
-                value="{{ field_value(form.dueDate) }}"
-                placeholder="{{ field_label(form.dueDate) }}..."
-                class="drop-shadow-md"
-            ></input>
-        </div>
-        
-        <div class="flex flex-col">
-            <label for="{{ field_name(form.category) }}">{{ field_label(form.category) }}</label>
-            <select
-                required name="{{ field_name(form.category) }}"
-                id="{{ field_name(form.category) }}"
-                class="drop-shadow-md"
-            >
-                <option value="">(Aucune catégorie)</option>
+        <div class="grid grid-cols-2 gap-2">
+            <div class="flex flex-col">
+                <label for="{{ field_name(form.dueDate) }}">{{ field_label(form.dueDate) }}</label>
+                <input
+                    required
+                    type="datetime-local"
+                    id="{{ field_name(form.dueDate) }}"
+                    name="{{ field_name(form.dueDate) }}"
+                    value="{{ field_value(form.dueDate) }}"
+                    placeholder="{{ field_label(form.dueDate) }}..."
+                    class="border shadow-sm  border-slate-200 p-1 rounded-md"
+                ></input>
+            </div>
+            
+            <div class="flex flex-col">
+                <label for="{{ field_name(form.category) }}">{{ field_label(form.category) }}</label>
+                <select
+                    required name="{{ field_name(form.category) }}"
+                    id="{{ field_name(form.category) }}"
+                    class="border shadow-sm  border-slate-200 p-1 rounded-md"
+                >
+                    <option value="">(Aucune catégorie)</option>
 
-                {% for label, value in field_choices(form.category) %}
-                    <option value="{{ value }}">{{ label }}</option>
-                {% endfor %}
-            </select>
-        </div>
+                    {% for label, value in field_choices(form.category) %}
+                        <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>  
 
-        <button class="text-lg m-4 rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700 transition-colors"">{{ button_label|default('Enregistrer') }}</button>
+        <button class="text-lg my-2 rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700 transition-colors"">{{ button_label|default('Enregistrer') }}</button>
     </div>
 {{ form_end(form) }}

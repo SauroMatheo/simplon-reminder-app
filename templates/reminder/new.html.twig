@@ -3,13 +3,17 @@
 {% block title %}New Reminder{% endblock %}
 
 {% block body %}
-<div class="mx-auto max-w-7xl px-6 lg:px-0">
-    <div class="mx-auto max-w-2xl lg:mx-0">
-        <h1 class="text-pretty text-4xl font-bold text-gray-900 sm:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-        Créer un noveau rappel</h1>
+<div class="container mx-auto mt-8">
+    <div class="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="bg-white rounded-lg px-8 pt-6">
+            <h1 class="text-3xl font-bold mb-6 text-gray-800 border-b pb-4">Créer un noveau rappel</h1>
+        </div>
+        <div class="px-8 pb-6">
+            {{ include('reminder/_form.html.twig') }}
+            <a href="{{ path('app_reminder_index') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors duration-200">
+                ◄ Retour aux rappels
+            </a>
+        </div>
     </div>
-
-    {{ include('reminder/_form.html.twig') }}
-
-    <a href="{{ path('app_reminder_index') }}">Retour aux rappels</a>
+</div>
 {% endblock %}
