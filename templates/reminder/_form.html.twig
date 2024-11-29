@@ -1,4 +1,59 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Enregistrer') }}</button>
+    {# {{ form_widget(form) }} #}
+    <div class="flex flex-col">
+        <div class="flex flex-col">
+            <label for="{{ field_name(form.title) }}">{{ field_label(form.title) }}</label>
+            <input
+                required
+                maxlength=255
+                id="{{ field_name(form.title) }}"
+                name="{{ field_name(form.title) }}"
+                value="{{ field_value(form.title) }}"
+                placeholder="{{ field_label(form.title) }}..."
+                class="drop-shadow-md"
+            ></input>
+        </div>
+
+        <div class="flex flex-col">
+            <label for="{{ field_name(form.description) }}">{{ field_label(form.description) }}</label>
+            <textarea
+                required
+                id="{{ field_name(form.description) }}"
+                name="{{ field_name(form.description) }}"
+                value="{{ field_value(form.description) }}"
+                placeholder="{{ field_label(form.description) }}..."
+                class="drop-shadow-md"
+            ></textarea>
+        </div>
+
+        <div class="flex flex-col">
+            <label for="{{ field_name(form.dueDate) }}">{{ field_label(form.dueDate) }}</label>
+            <input
+                required
+                type="datetime-local"
+                id="{{ field_name(form.dueDate) }}"
+                name="{{ field_name(form.dueDate) }}"
+                value="{{ field_value(form.dueDate) }}"
+                placeholder="{{ field_label(form.dueDate) }}..."
+                class="drop-shadow-md"
+            ></input>
+        </div>
+        
+        <div class="flex flex-col">
+            <label for="{{ field_name(form.category) }}">{{ field_label(form.category) }}</label>
+            <select
+                required name="{{ field_name(form.category) }}"
+                id="{{ field_name(form.category) }}"
+                class="drop-shadow-md"
+            >
+                <option value="">(Aucune catégorie)</option>
+
+                {% for label, value in field_choices(form.category) %}
+                    <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button class="text-lg m-4 rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700 transition-colors"">{{ button_label|default('Enregistrer') }}</button>
+    </div>
 {{ form_end(form) }}
