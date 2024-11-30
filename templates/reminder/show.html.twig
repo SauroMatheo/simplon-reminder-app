@@ -1,52 +1,48 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Rappel{% endblock %}
+{% block title %}CT - Détails du rappel{% endblock %}
 
 {% block body %}
-    <h1>Rappel</h1>
-
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Identifiant</th>
-                <td>{{ reminder.id }}</td>
-            </tr>
-            <tr>
-                <th>Nom</th>
-                <td>{{ reminder.title }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ reminder.description }}</td>
-            </tr>
-            <tr>
-                <th>Créée le</th>
-                <td>{{ reminder.createdAt ? reminder.createdAt|date('d-m-Y H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Date limite</th>
-                <td>{{ reminder.dueDate ? reminder.dueDate|date('d-m-Y H:i:s') : '' }}</td>
-            </tr>
-            {% if reminder.completedAt %}
-            <tr>
-                <th>Terminé le</th>
-                <td>{{ reminder.completedAt|date('d-m-Y H:i:s') }}</td>
-            </tr>
-            {% endif %}
-            <tr>
-                <th>Terminé ?</th>
-                <td>{{ reminder.isDone ? 'Terminé' : 'À faire' }}</td>
-            </tr>
-            <tr>
-                <th>Catégorie</th>
-                <td>{{ reminder.category ? reminder.category.name : 'Aucune catégorie' }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_reminder_index') }}">Retour aux rappels</a>
-
-    <a href="{{ path('app_reminder_edit', {'id': reminder.id}) }}">Modifier</a>
-
-    {{ include('reminder/_delete_form.html.twig') }}
+    <div class="container mx-auto">
+        <div class="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="bg-white rounded-lg px-8 pt-6">
+                <h1 class="text-3xl font-bold mb-6 text-gray-800 border-b pb-4">Détails du rappel</h1>
+            </div>
+            <div class="px-8 pb-6">
+                <div class="mb-4">
+                    <span class="font-bold">Nom:</span>
+                    <span>{{ reminder.title }}</span>
+                </div>
+                <div class="mb-4">
+                    <span class="font-bold">Description:</span>
+                    <span>{{ reminder.description }}</span>
+                </div>
+                <div class="mb-4">
+                    <span class="font-bold">Créée le :</span>
+                    <span>{{ reminder.createdAt ? reminder.createdAt|date('d-m-Y H:i:s') : '' }}</span>
+                </div>
+                <div class="mb-4">
+                    <span class="font-bold">Date limite :</span>
+                    <span>{{ reminder.dueDate ? reminder.dueDate|date('d-m-Y H:i:s') : '' }}</span>
+                </div>
+                {% if reminder.completedAt %}
+                <div class="mb-4">
+                    <span class="font-bold">Status :</span>
+                    <span>Terminé le {{ reminder.completedAt|date('d-m-Y H:i:s') }}</span>
+                </div>
+                {% endif %}
+                <div class="mb-4">
+                    <span class="font-bold">Status :</span>
+                    <span>{{ reminder.isDone ? 'Terminé' : 'À faire' }}</span>
+                </div>
+                <div class="mb-4">
+                    <span class="font-bold">Catégorie :</span>
+                    <span>{{ reminder.category ? reminder.category.name : 'Aucune catégorie' }}</span>
+                </div>
+            </div>
+            <a href="{{ path('app_reminder_index') }}" class="inline-flex items-center justify-center w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors duration-200">
+                    ◄ Retour aux rappels
+                </a>
+        </div>
+    </div>
 {% endblock %}

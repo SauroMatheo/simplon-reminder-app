@@ -1,9 +1,40 @@
 <div class="bg-gradient-to-b from-blue-600 to-blue-500 text-white 2xl:w-80 2xl:max-w-80 m-0">
-    <span class="flex flex-wrap items-center justify-evenly flex-row 2xl:flex-col flex-grow font-bold p-4 gap-8 text-center">
-        <a href="{{ path('homepage') }}" class="text-4xl">Accueil</a>
-        <a href="{{ path('app_reminder_index') }}" class="text-3xl">Rappels</a>
-        <a href="{{ path('app_reminder_new') }}" class="text-3xl">Créer un rappel</a>
-        <a href="{{ path('app_category_index') }}" class="text-3xl">Catégories</a>
-        <a href="{{ path('app_category_new') }}" class="text-3xl">Créer une catégorie</a>
-    </span>
+    <div class="flex flex-col p-6">
+        <!-- Logo ou titre (si nécessaire) -->
+        <div class="flex justify-center items-center mb-8">
+            <h1 class="text-3xl font-semibold">CleverTasks</h1>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex flex-col gap-6">
+            <!-- Lien Accueil -->
+            <a href="{{ path('homepage') }}" class="flex items-center text-xl font-medium text-white hover:text-blue-300 transition-colors duration-300 transform hover:scale-105 py-2 px-4 rounded-md hover:bg-blue-700">
+                Accueil
+            </a>
+
+            <!-- Lien Rappels -->
+            <a href="{{ path('app_reminder_index') }}" class="flex items-center text-xl font-medium text-white hover:text-blue-300 transition-colors duration-300 transform hover:scale-105 py-2 px-4 rounded-md hover:bg-blue-700">
+                Rappels
+            </a>
+
+            <!-- Lien Créer un rappel -->
+            <a href="{{ path('app_reminder_new') }}" class="flex items-center text-xl font-medium text-white hover:text-blue-300 transition-colors duration-300 transform hover:scale-105 py-2 px-4 rounded-md hover:bg-blue-700">
+                Créer un rappel
+            </a>
+
+            <!-- Lien Catégories -->
+            <a href="{{ path('app_category_index') }}" class="flex items-center text-xl font-medium text-white hover:text-blue-300 transition-colors duration-300 transform hover:scale-105 py-2 px-4 rounded-md hover:bg-blue-700">
+                Catégories
+            </a>
+
+            <!-- Lien Créer une catégorie -->
+            <a href="{{ path('app_category_new') }}" class="flex items-center text-xl font-medium text-white hover:text-blue-300 transition-colors duration-300 transform hover:scale-105 py-2 px-4 rounded-md hover:bg-blue-700">
+                Créer une catégorie
+            </a>
+        </div>
+    </div>
 </div>
+
+
+
+
